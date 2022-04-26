@@ -8,4 +8,4 @@ Data is grouped in two batches:
 - year 2000 batch, containing data between _1998_ and _2006_ for 15 european countries
 - year 2010 batch, containing data between _2008_ and _2015_ for 18 european countries
   
-Data is on individuals aged _15_ to _74_, of _Male_ and _Female_ sex, tracking _77_ __main__ activities
+Data is on individuals aged _15_ to _74_, of _Male_ and _Female_ sex, tracking _56_ __main__ activities
