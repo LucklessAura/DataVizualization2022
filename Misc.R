@@ -67,9 +67,16 @@ periodToPaddedString <- function(periods)
 }
 
 
-labelMaker <- function(name, value)
+secondsToPeriodLabeler <- function(name, value)
 {
-  mapply(paste, sep = ":",name,periodToPaddedString(lubridate::seconds_to_period(value)))
+  mapply(paste, sep = ": ",name,periodToPaddedString(lubridate::seconds_to_period(value)))
+}
+
+
+toLabelDataframe <- function(x)
+{
+  df <- set_names(x = mapply(FUN = str_wrap,x$label,width = 30),nm = x$value)
+  return(df)
 }
 
 
