@@ -1,10 +1,14 @@
 
+# actually sued activities in dataset
 UsedActivities <- NULL
+#actually used age intervals in dataset
 UsedAgeIntervals <- NULL
+# actually used sexes in dataset
 UsedSexes <- NULL
+# actually used countries in dataset
 UsedCountriesList <- NULL
 
-
+# iso2 used countries codes to iso3 codes
 CreateCountryList <- function(data)
 {
   iso2Countries <- unique(data$geo)
@@ -12,6 +16,7 @@ CreateCountryList <- function(data)
   UsedCountriesList <<- reshaped$iso3[match(iso2Countries,reshaped$iso2)]
   
 }
+
 
 CreateUsedActivityLables <- function(data)
 {
@@ -47,7 +52,7 @@ CreateUsedLists <- function(data)
   CreateUsedSexes(data)
 }
 
-
+# get seconds for given filters
 getTimesForChoices <- function(iso3List,activity,sex,age)
 {
   
@@ -59,6 +64,8 @@ getTimesForChoices <- function(iso3List,activity,sex,age)
   return(timeSpent[match(iso3List, timeSpent$geo),]$summ)
 }
 
+
+# periods dont always have the same string length, solve that by padding when needed
 periodToPaddedString <- function(periods)
 {
   paste0(str_pad(width = 2,pad = '0',side = 'left',string = periods@hour),":",
@@ -67,19 +74,20 @@ periodToPaddedString <- function(periods)
 }
 
 
+# seconds to padded period
 secondsToPeriodLabeler <- function(name, value)
 {
   mapply(paste, sep = ": ",name,periodToPaddedString(lubridate::seconds_to_period(value)))
 }
 
-
+# labeller needs this type of structure to works properly 
 toLabelDataframe <- function(x)
 {
   df <- set_names(x = mapply(FUN = str_wrap,x$label,width = 30),nm = x$value)
   return(df)
 }
 
-
+# get iso2 country code for a iso3 code
 getIso2ForIso3 <- function(iso3)
 {
   reshaped <- flatten(countryList) %>% bind_rows()

@@ -12,23 +12,34 @@ library(ggplot2)
 source(file = "./Data.R")
 source(file = "./Misc.R")
 
-
-choices <- NULL
-currentLabel <- NULL
+# polygons for all the countries in the world
 fullWorldPolygonData <- geojson_read("./countries.geojson",what = "sp")
+
+# will get filtered to include only polygons of countries in the dataset
 polygonData <- fullWorldPolygonData
+
+#cloropleths colors to use
 colorToUse <- NULL
+
+# possible periods of time in the dataset
 periodChoices <- list("2000","2010","2000 and 2010")
+
+# selected countries in interactions of type 2 and 3 
 selectedCountries <- list()
+
+# to be sure that the same click event is not handeled twice 
 lastEventSecret <- -1.0
 
 
+# swaps the possible color interval for the Choropleths, it will always start from floralwhite, no other use than for aesthetics 
 swapColors <- function()
 {
   colorToUse <<- colorRamp(colorIntervals[[sample(1:length(colorIntervals), 1)]], interpolate="linear")
 }
 
 
+# add to the provided map object either the provided polygons or all the polygons present currently in the polygonData object
+# also requires the layerID for the object, fill color for pllygons and labels for polygons
 addPolygonsData <- function(map,dataToDisplay = NULL,layerID, polygonFillColor, labels)
 {
   if(is.null(dataToDisplay))
@@ -45,6 +56,7 @@ addPolygonsData <- function(map,dataToDisplay = NULL,layerID, polygonFillColor, 
                         highlightOptions = highlightOptions(weight = 5,color = "#313E78",fillOpacity = 0.7,bringToFront = TRUE))
 }
 
+# clear current map and add floralwhite polygons corresponding to the data in polygonData
 whitePolygons <- function()
 {
   selectedCountries <<- list()
@@ -54,20 +66,29 @@ whitePolygons <- function()
   addPolygonsData(map = proxy,layerID = polygonData@data$ISO_A3,polygonFillColor = "floralwhite",labels = polygonData@data$ADMIN)
 }
 
-
+#defines the layout of the actual web page
 ui <- fluidPage(
   shinyjs::useShinyjs(),
-  titlePanel("some title"),
-  
-  fluidRow(
-    column(12,radioButtons("interactionType",label = "Map Use",selected = 1,choices = list("Choropleths" = 1, "Countries Comparison" = 2, "Single Country Select" = 3))),
-    column(12,selectizeInput("periodSelect",h3("Select data period"),choices = periodChoices)),
-    column(4,selectizeInput("activitySelect",h3("Select the activity"),choices = NULL)),
-    column(4,selectizeInput("genderSelect",h3("Select the gender"),choices = NULL)),
-    column(4,selectizeInput("ageIntervalSelect",h3("Select the age interval"),choices = NULL)),
-    column(12,leafletOutput("map",width = "100%", height = 800)),
-    column(12,conditionalPanel(condition = "input.interactionType > 1",plotOutput("hidableGraph")))
+  titlePanel("some title"), #title of the page
+  navbarPage("Some Appliction",id = "nav", 
+             
+  tabPanel("Data Analysis", 
+            fluidRow(
+              column(12,"Static content goes here"), # static analysis of the data should be put here,for now a fluid row, subject to change if other layout is more appropriate
+  )),
+  # interactive map to display data
+  tabPanel("Interactive",     
+    fluidRow(
+      column(12,radioButtons("interactionType",label = "Map Use",selected = 1,choices = list("Choropleths" = 1, "Countries Comparison" = 2, "Single Country Select" = 3))),
+      column(12,selectizeInput("periodSelect",h3("Select data period"),choices = periodChoices)),
+      column(4,selectizeInput("activitySelect",h3("Select the activity"),choices = NULL)),
+      column(4,selectizeInput("genderSelect",h3("Select the gender"),choices = NULL)),
+      column(4,selectizeInput("ageIntervalSelect",h3("Select the age interval"),choices = NULL)),
+      column(12,leafletOutput("map",width = "100%", height = 800)),
+      column(12,conditionalPanel(condition = "input.interactionType > 1",plotOutput("hidableGraph")))
+    )
   )
+)
   
 )
 
@@ -77,10 +98,10 @@ ui <- fluidPage(
 
 
 
-
+# server side 
 server <- function(input, output, session) {
   
-  #input from user on selects
+  #input from user on selects of the interactive page
   observe({
     activity <- selectedActivity()
     sex <- input$genderSelect
@@ -100,9 +121,11 @@ server <- function(input, output, session) {
     
   })
   
+  # Choropleths update depending on given data filters 
   updateChoropleths <- function(activity,sex,age)
   {
-    #when switching to from map types all 3 selects update so we get here 3 times, not sure if pooling events is a thing in shiny :/
+    # still get called multiple times :(
+    
     
     timings = getTimesForChoices(iso3List = polygonData@data$ISO_A3,activity = activity,sex = sex,age = age)
     colors <- colorDomain(activity,sex,age)
@@ -125,8 +148,9 @@ server <- function(input, output, session) {
     
   }
   
-  
-  observe({
+  # basic initialization of the map, depends on the map mode(Choropleths or Basic White Polygons)
+  initialize <-function ()
+    {
     
     proxy <- leafletProxy("map")
     proxy %>% clearShapes()
@@ -153,16 +177,28 @@ server <- function(input, output, session) {
     
     output$hidableGraph <- NULL
     
-    },priority = 10)
+  }
   
-  
-  output$map <- renderLeaflet({
-    map <- leaflet(options = leafletOptions(minZoom = 4, maxZoom = 5,zoomControl = FALSE,worldCopyJump = TRUE)) %>% 
-      setView(lat = 57.923470, lng = 11.750252, zoom = 4) %>% 
-      addTiles(urlTemplate="https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png")
-    
+  # decide which tab of the page to initialize
+  observe({
+    if(input$nav == "Interactive")
+    {
+      output$map <- renderLeaflet({
+        map <- leaflet(options = leafletOptions(minZoom = 4, maxZoom = 5,zoomControl = FALSE,worldCopyJump = TRUE)) %>% 
+          setView(lat = 57.923470, lng = 11.750252, zoom = 4) %>% 
+          addTiles(urlTemplate="https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png")
+      })
+      
+      initialize()
+    }
+    else
+    {
+      # initialize static content
+    }
   })
   
+  
+  # get the color intervals for the data according to given filters
   colorDomain <- function(act,sex,age)
     {
       timeSpent = data[data$acl00 == act & data$sex == sex & data$age == age,]
@@ -174,23 +210,21 @@ server <- function(input, output, session) {
     }
   
   
-  
+  # when a different activity is chosen change the color of choropleths, aesthetics cahnge only 
   selectedActivity <<- function(){
     swapColors()
     return(input$activitySelect)
     }
   
-  
+  #find which country the click was inside and dispaly data graph for it, also depends on the map interaction mode
   observe({
     if(!is.null(input$map_shape_click$id) && input$map_shape_click$.nonce != lastEventSecret & input$interactionType > 1)
     {
       lastEventSecret <<- input$map_shape_click$.nonce
       
       proxy <- leafletProxy("map",session = session)
-      lat <- input$map_shape_click$lat
-      lon <- input$map_shape_click$lng
-      
-      coords <- as.data.frame(cbind(lon, lat))
+
+      coords <- as.data.frame(cbind(input$map_shape_click$lng, input$map_shape_click$lat))
       point <- SpatialPoints(coords,CRS("+proj=longlat +datum=WGS84 +no_defs"))
       
       selectedCountry <- polygonData[point,]
@@ -231,13 +265,14 @@ server <- function(input, output, session) {
     }
   },priority = 5)
 
-  
+  #swap interaction type with the map
   observe({
     switch (input$interactionType,
       "1" = {
         shinyjs::enable("activitySelect")
         shinyjs::enable("genderSelect")
         shinyjs::enable("ageIntervalSelect")
+        
       },
       "2" ={
         shinyjs::disable("activitySelect")
@@ -255,7 +290,7 @@ server <- function(input, output, session) {
     )
   },priority = 15)
   
-  
+  # update the graph for the type 2 and 3 interactions
   updateHidableGraph <- function()
   {
     if(length(selectedCountries) < 1)
@@ -305,4 +340,6 @@ server <- function(input, output, session) {
   
 }
 
+
+# call to build web app
 shinyApp(ui, server)
