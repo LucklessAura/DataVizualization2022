@@ -8,6 +8,8 @@ library(tidyverse)
 library(lubridate)
 library(shinyjs)
 library(ggplot2)
+library(rmarkdown)
+library(knitr)
 
 source(file = "./Data.R")
 source(file = "./Misc.R")
@@ -69,13 +71,10 @@ whitePolygons <- function()
 #defines the layout of the actual web page
 ui <- fluidPage(
   shinyjs::useShinyjs(),
-  titlePanel("some title"), #title of the page
-  navbarPage("Some Appliction",id = "nav", 
-             
+  navbarPage("Time Spent Visualizer",id = "nav", 
   tabPanel("Data Analysis", 
-            fluidRow(
-              column(12,"Static content goes here"), # static analysis of the data should be put here,for now a fluid row, subject to change if other layout is more appropriate
-  )),
+    uiOutput('markdown',style="max-width:800px; margin: auto")
+   ),
   # interactive map to display data
   tabPanel("Interactive",     
     fluidRow(
@@ -89,9 +88,15 @@ ui <- fluidPage(
     )
   )
 )
-  
+,tags$head(
+  tags$style(HTML("
+     
+      body {
+        max-width: 100% !important;
+      }"
+  ))
+),
 )
-
 
 
 
@@ -100,6 +105,10 @@ ui <- fluidPage(
 
 # server side 
 server <- function(input, output, session) {
+  
+  output$markdown <- renderUI({
+    HTML(markdown::markdownToHTML(knit('static.rmd', quiet = TRUE)))
+  })
   
   #input from user on selects of the interactive page
   observe({
@@ -190,10 +199,6 @@ server <- function(input, output, session) {
       })
       
       initialize()
-    }
-    else
-    {
-      # initialize static content
     }
   })
   
@@ -306,7 +311,7 @@ server <- function(input, output, session) {
       
       output$hidableGraph <- renderPlot(
         {
-          ggplot(data = dataToDisplay,aes(x = geo, y = TIME_SP, fill=geo)) + geom_bar(stat = "identity",position = "dodge") +  
+          ggplot(data = dataToDisplay,aes(x = geo, y = TIME_SP, fill=geo)) + geom_bar(stat = "summary",position = "dodge") +  
             xlab("Country") + ylab("Time in Seconds")   +  
             facet_wrap(~acl00 ,scales = "free",ncol = 1 ,labeller = labeller(acl00 = toLabelDataframe(UsedActivities))) +
             geom_label(data = dataToDisplay,aes(label = TIME_SP)) +
@@ -324,7 +329,7 @@ server <- function(input, output, session) {
       output$hidableGraph <- renderPlot(
         {
           ggplot(data = dataToDisplay,aes(x = sex, y = TIME_SP,fill=sex)) + 
-            geom_bar(stat = "identity",position = "dodge") +  xlab("Sex") + ylab("Time in Seconds")   +  
+            geom_bar(stat = "summary",position = "dodge") +  xlab("Sex") + ylab("Time in Seconds")   +  
             facet_grid(acl00 ~ age,scales = "free",labeller=labeller(acl00 = toLabelDataframe(UsedActivities),age = toLabelDataframe(UsedAgeIntervals))) +
             geom_label(data = dataToDisplay,aes(label = TIME_SP)) +
             theme(strip.text = element_text(size = 15),

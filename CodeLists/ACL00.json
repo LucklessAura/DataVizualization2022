@@ -1,0 +1,28 @@
+{ 
+ "activities" : [
+		{
+			"label" : "Personal/Leisure Time",
+			"acl00" : ["AC0","AC0A","AC01","AC02","AC03","AC344","AC4-8","AC4-8A","AC43","AC51A","AC51B","AC52","AC52A","AC521","AC522","AC522A","AC523H","AC525","AC53","AC611","AC6A","AC733","AC7B","AC7A","AC81","AC812","AC811","AC82","AC83","AC4-8NSP","AC9A","AC9D","AC90NSP"]
+		},
+		{
+			"label" : "Education",
+			"acl00" : ["AC1_2_TR","AC2","AC21A","AC212","AC22","AC9B","AC9E"]
+		},
+		{
+			"label" : "Related to Employment",
+			"acl00" : ["AC1_2_TR","AC1_TR","AC1A","AC1B","AC913","AC9E"]
+		},
+		{
+			"label" : "Family Time",
+			"acl00" : ["AC3_X_38","AC3","AC3_TR","AC38","AC38A","AC38B","AC511","AC938"]
+		},
+		{
+			"label" : "Household keeping",
+			"acl00" : ["AC3_X_38","AC3","AC3_TR","AC31A","AC313","AC321","AC32A","AC331","AC332","AC35","AC37_39","AC9C"]
+		},
+		{
+			"label" : "Work unrelated to Employment or Household keeping",
+			"acl00" : ["AC33A","AC34A","AC342","AC343","AC36","AC41","AC41A","AC42","AC42A","AC43A","AC936"]
+		}
+	]
+}
