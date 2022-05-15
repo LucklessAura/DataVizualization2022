@@ -41,7 +41,7 @@ Here we have a graph that shows the mean time spent by Male and Female counterpa
 ```{r all_age_split_on_activity, echo=FALSE, fig.height=15,error=FALSE,warning=FALSE}
 ggplot(data = dataLabeledByActivityType,aes(x = sex, y = TIME_SP, fill=sex)) + geom_bar(stat = "summary",position = "dodge") + 
   ylab("Time in Seconds")   +  
-  facet_grid(label ~ sex,scales = "free") +
+  facet_grid(label ~ sex,scales = "free") + xlab("average of all ages") +  
   theme(strip.text = element_text(size = 15),
                   axis.title.x = element_text(size = 15),
                   axis.title.y = element_text(size = 15),
@@ -57,7 +57,7 @@ It might be useful to have a closer look at how people are using their time depe
 
 ```{r 20_t0_24_split_on_activity, echo=FALSE, fig.height=15,error=FALSE,warning=FALSE}
 ggplot(data = dataLabeledByActivityType[dataLabeledByActivityType$age == "Y20-24",],aes(x = sex, y = TIME_SP, fill=sex)) + geom_bar(stat = "summary",position = "dodge") + 
-  ylab("Time in Seconds")   +  
+  ylab("Time in Seconds")   +  xlab("20 to 24") +  
   facet_grid(label ~ sex,scales = "free") +
   theme(strip.text = element_text(size = 15),
                   axis.title.x = element_text(size = 15),
@@ -66,5 +66,345 @@ ggplot(data = dataLabeledByActivityType[dataLabeledByActivityType$age == "Y20-24
                   axis.text.x = element_text(size = 15),
                   panel.spacing.y = unit(1,"cm",data = NULL)
                   ,legend.position="none")
+```   
+  
+Maybe not unexpectedly younger people do seem to spend way more time on activities related to education and less on those related to family time and house keeping
+  
+```{r 25_t0_44_split_on_activity, echo=FALSE, fig.height=15,error=FALSE,warning=FALSE}
+ggplot(data = dataLabeledByActivityType[dataLabeledByActivityType$age == "Y25-44",],aes(x = sex, y = TIME_SP, fill=sex)) + geom_bar(stat = "summary",position = "dodge") + 
+  ylab("Time in Seconds")   +  xlab("25 to 44") +  
+  facet_grid(label ~ sex,scales = "free") +
+  theme(strip.text = element_text(size = 15),
+                  axis.title.x = element_text(size = 15),
+                  axis.title.y = element_text(size = 15),
+                  axis.text.y = element_text(size = 15),
+                  axis.text.x = element_text(size = 15),
+                  panel.spacing.y = unit(1,"cm",data = NULL)
+                  ,legend.position="none")
+```  
+  
+As age progresses males keep increasing the time spent with family having an increase of about 30% while women who where already spending almost twice as much time on those activities than their male counterpart further increase the difference by almost doubling their previous average time spent  
+  
+
+```{r 45_t0_64_split_on_activity, echo=FALSE, fig.height=15,error=FALSE,warning=FALSE}
+ggplot(data = dataLabeledByActivityType[dataLabeledByActivityType$age == "Y45-64",],aes(x = sex, y = TIME_SP, fill=sex)) + geom_bar(stat = "summary",position = "dodge") + 
+  ylab("Time in Seconds")   + xlab("45 to 64") +  
+  facet_grid(label ~ sex,scales = "free") +
+  theme(strip.text = element_text(size = 15),
+                  axis.title.x = element_text(size = 15),
+                  axis.title.y = element_text(size = 15),
+                  axis.text.y = element_text(size = 15),
+                  axis.text.x = element_text(size = 15),
+                  panel.spacing.y = unit(1,"cm",data = NULL)
+                  ,legend.position="none")
+```  
+  
+From the few above graphs it can be seen that usually activities related to pleasure and time for oneself stay relatively stable, activities related to education sharply decrease after the age of 24 for both males and females. It seems that women end up spending about double the time in activities related to housekeeping and spending time with their family while men consistently spend more time on activities related to employment
+
+Since our chosen dataset's main classification system used  is the "Activity coding list" (ACL), which assigns a code to the activities (primary and secondary) that the person is doing during the day, we decided to present a graph on the primary activities. 
+The graph shows mean time spent by Male and Female counterparts on the primary types of activities:
+
+```{r maligraph2, echo=FALSE, fig.height=15,error=FALSE,warning=FALSE}
+#male activity time spent
+library(gridExtra)
+period_2000_rearranged <- read.csv("./period_2000_rearranged.csv")
+Graph1 <- data.frame(period_2000_rearranged)
+data_AC0 = subset(Graph1,sex == "M" & acl00 =="AC0" & age =="TOTAL")
+time1 <- data_AC0$TIME_SP
+my_list_AC0 <- difftime(as.POSIXct(time1, format = '%H:%M'), as.POSIXct('00:00', format = '%H:%M'), units = 'min')
+AC0 <- mean(my_list_AC0)
+
+data_AC1_TR = subset(Graph1,sex == "M" & acl00 =="AC1_TR" & age =="TOTAL")
+time1 <- data_AC1_TR$TIME_SP
+my_list_AC1_TR <- difftime(as.POSIXct(time1, format = '%H:%M'), as.POSIXct('00:00', format = '%H:%M'), units = 'min')
+AC1_TR <- mean(my_list_AC1_TR)
+
+data_AC2 = subset(Graph1,sex == "M" & acl00 =="AC2" & age =="TOTAL")
+time1 <- data_AC2$TIME_SP
+my_list_AC2 <- difftime(as.POSIXct(time1, format = '%H:%M'), as.POSIXct('00:00', format = '%H:%M'), units = 'min')
+AC2 <- mean(my_list_AC2)
+
+data_AC3 = subset(Graph1,sex == "M" & acl00 =="AC3" & age =="TOTAL")
+time1 <- data_AC3$TIME_SP
+my_list_AC3 <- difftime(as.POSIXct(time1, format = '%H:%M'), as.POSIXct('00:00', format = '%H:%M'), units = 'min')
+AC3 <- mean(my_list_AC3)
+
+data_AC4_8 = subset(Graph1,sex == "M" & acl00 =="AC4-8" & age =="TOTAL")
+time1 <- data_AC4_8$TIME_SP
+my_list_AC4_8 <- difftime(as.POSIXct(time1, format = '%H:%M'), as.POSIXct('00:00', format = '%H:%M'), units = 'min')
+AC4_8 <- mean(my_list_AC4_8)
+
+myplot <- c(AC0, AC1_TR, AC2, AC3, AC4_8)
+myplot <- gsub("Time difference of ","", myplot)
+myplot <- gsub(" mins","", myplot)
+myplot <- as.double(myplot)
+
+#-------------------------------------------------------------------------------------------
+#female activity time spent
+data_AC0 = subset(Graph1,sex == "F" & acl00 =="AC0" & age =="TOTAL")
+time1 <- data_AC0$TIME_SP
+my_list_AC0 <- difftime(as.POSIXct(time1, format = '%H:%M'), as.POSIXct('00:00', format = '%H:%M'), units = 'min')
+AC0 <- mean(my_list_AC0)
+
+data_AC1_TR = subset(Graph1,sex == "F" & acl00 =="AC1_TR" & age =="TOTAL")
+time1 <- data_AC1_TR$TIME_SP
+my_list_AC1_TR <- difftime(as.POSIXct(time1, format = '%H:%M'), as.POSIXct('00:00', format = '%H:%M'), units = 'min')
+AC1_TR <- mean(my_list_AC1_TR)
+
+data_AC2 = subset(Graph1,sex == "F" & acl00 =="AC2" & age =="TOTAL")
+time1 <- data_AC2$TIME_SP
+my_list_AC2 <- difftime(as.POSIXct(time1, format = '%H:%M'), as.POSIXct('00:00', format = '%H:%M'), units = 'min')
+AC2 <- mean(my_list_AC2)
+
+data_AC3 = subset(Graph1,sex == "F" & acl00 =="AC3" & age =="TOTAL")
+time1 <- data_AC3$TIME_SP
+my_list_AC3 <- difftime(as.POSIXct(time1, format = '%H:%M'), as.POSIXct('00:00', format = '%H:%M'), units = 'min')
+AC3 <- mean(my_list_AC3)
+
+data_AC4_8 = subset(Graph1,sex == "F" & acl00 =="AC4-8" & age =="TOTAL")
+time1 <- data_AC4_8$TIME_SP
+my_list_AC4_8 <- difftime(as.POSIXct(time1, format = '%H:%M'), as.POSIXct('00:00', format = '%H:%M'), units = 'min')
+AC4_8 <- mean(my_list_AC4_8)
+
+myplot2 <- c(AC0, AC1_TR, AC2, AC3, AC4_8)
+myplot2 <- gsub("Time difference of ","", myplot2)
+myplot2 <- gsub(" mins","", myplot2)
+myplot2 <- as.double(myplot2)
+
+#----------------------------------------------------------------------------------
+#plot femals vs males time spent activities
+par(mfrow = c(1:2))
+g3 <- barplot(myplot,
+              main = "Male activity time spent",
+              xlab = "Activities",
+              ylab = "Minutes",
+              names.arg = c("Personal care", "Employment activities", "Study", "Family care", "Leisure time"),
+              col = "lightblue", horiz=TRUE
+              
+              
+)
+
+g4 <- barplot(myplot2,
+              main = "Female activity time spent",
+              xlab = "Activities",
+              ylab = "Minutes",
+              names.arg = c("Personal care", "Employment activities", "Study", "Family care", "Leisure time"),
+              col = "lightpink", horiz=TRUE
+              
+              
+)
+
 ```
+
+
+As we can see from the above graph and the one previously presented, in general women spend more time on activities related to family care, while males usually spend more time at employment related activities.
+
+Since the biggest difference between males and females activities was regarding family/household related activities, we decided to make a graph about the secondary types of activities of this category.
+
+Here we have a graph that shows the mean time spent by Male and Female counterparts on household related activities:
+
+
+```{r maligraph3, echo=FALSE, fig.height=15,error=FALSE,warning=FALSE}
+#---------------------------------------------------------------
+#male activity time spent
+data_AC31A = subset(Graph1,sex == "M" & acl00 =="AC31A" & age =="TOTAL")
+time1 <- data_AC31A$TIME_SP
+my_list_AC31A <- difftime(as.POSIXct(time1, format = '%H:%M'), as.POSIXct('00:00', format = '%H:%M'), units = 'min')
+AC31A <- mean(my_list_AC31A)
+
+data_AC313 = subset(Graph1,sex == "M" & acl00 =="AC313" & age =="TOTAL")
+time1 <- data_AC313$TIME_SP
+my_list_AC313 <- difftime(as.POSIXct(time1, format = '%H:%M'), as.POSIXct('00:00', format = '%H:%M'), units = 'min')
+AC313 <- mean(my_list_AC313)
+
+data_AC331 = subset(Graph1,sex == "M" & acl00 =="AC331" & age =="TOTAL")
+time1 <- data_AC2$TIME_SP
+my_list_AC331 <- difftime(as.POSIXct(time1, format = '%H:%M'), as.POSIXct('00:00', format = '%H:%M'), units = 'min')
+AC331 <- mean(my_list_AC331)
+
+data_AC332 = subset(Graph1,sex == "M" & acl00 =="AC332" & age =="TOTAL")
+time1 <- data_AC332$TIME_SP
+my_list_AC332 <- difftime(as.POSIXct(time1, format = '%H:%M'), as.POSIXct('00:00', format = '%H:%M'), units = 'min')
+AC332 <- mean(my_list_AC332)
+
+data_AC34A = subset(Graph1,sex == "M" & acl00 =="AC34A" & age =="TOTAL")
+time1 <- data_AC34A$TIME_SP
+my_list_AC34A <- difftime(as.POSIXct(time1, format = '%H:%M'), as.POSIXct('00:00', format = '%H:%M'), units = 'min')
+AC34A <- mean(my_list_AC34A)
+
+data_AC35 = subset(Graph1,sex == "M" & acl00 =="AC35" & age =="TOTAL")
+time1 <- data_AC35$TIME_SP
+my_list_AC35 <- difftime(as.POSIXct(time1, format = '%H:%M'), as.POSIXct('00:00', format = '%H:%M'), units = 'min')
+AC35 <- mean(my_list_AC35)
+
+myplot5 <- c(AC31A, AC313, AC331, AC332, AC34A, AC35)
+myplot5 <- gsub("Time difference of ","", myplot5)
+myplot5 <- gsub(" mins","", myplot5)
+myplot5 <- as.double(myplot5)
+
+#----------------------------------------------------------------------------------
+
+
+#-------------------------------------------------------------------------------------------
+#female activity time spent
+data_AC31A = subset(Graph1,sex == "F" & acl00 =="AC31A" & age =="TOTAL")
+time1 <- data_AC31A$TIME_SP
+my_list_AC31A <- difftime(as.POSIXct(time1, format = '%H:%M'), as.POSIXct('00:00', format = '%H:%M'), units = 'min')
+AC31A <- mean(my_list_AC31A)
+
+data_AC313 = subset(Graph1,sex == "F" & acl00 =="AC313" & age =="TOTAL")
+time1 <- data_AC313$TIME_SP
+my_list_AC313 <- difftime(as.POSIXct(time1, format = '%H:%M'), as.POSIXct('00:00', format = '%H:%M'), units = 'min')
+AC313 <- mean(my_list_AC313)
+
+data_AC331 = subset(Graph1,sex == "F" & acl00 =="AC331" & age =="TOTAL")
+time1 <- data_AC2$TIME_SP
+my_list_AC331 <- difftime(as.POSIXct(time1, format = '%H:%M'), as.POSIXct('00:00', format = '%H:%M'), units = 'min')
+AC331 <- mean(my_list_AC331)
+
+data_AC332 = subset(Graph1,sex == "F" & acl00 =="AC332" & age =="TOTAL")
+time1 <- data_AC332$TIME_SP
+my_list_AC332 <- difftime(as.POSIXct(time1, format = '%H:%M'), as.POSIXct('00:00', format = '%H:%M'), units = 'min')
+AC332 <- mean(my_list_AC332)
+
+data_AC34A = subset(Graph1,sex == "F" & acl00 =="AC34A" & age =="TOTAL")
+time1 <- data_AC34A$TIME_SP
+my_list_AC34A <- difftime(as.POSIXct(time1, format = '%H:%M'), as.POSIXct('00:00', format = '%H:%M'), units = 'min')
+AC34A <- mean(my_list_AC34A)
+
+data_AC35 = subset(Graph1,sex == "F" & acl00 =="AC35" & age =="TOTAL")
+time1 <- data_AC35$TIME_SP
+my_list_AC35 <- difftime(as.POSIXct(time1, format = '%H:%M'), as.POSIXct('00:00', format = '%H:%M'), units = 'min')
+AC35 <- mean(my_list_AC35)
+
+myplot6 <- c(AC31A, AC313, AC331, AC332, AC34A, AC35)
+myplot6 <- gsub("Time difference of ","", myplot6)
+myplot6 <- gsub(" mins","", myplot6)
+myplot6 <- as.double(myplot6)
+
+#----------------------------------------------------------------------------------
+#---------------------------------------------------
+#plot females vs males time spent
+par(mfrow = c(1:2))
+g5 <- barplot(myplot5,
+        main = "Male activity time spent",
+        xlab = "Activities",
+        ylab = "Minutes",
+        names.arg = c("Food Management", "Dish washing", "Laundry", "Ironing", "Gardening", "Construction and repairs"),
+        col = "lightblue", horiz = TRUE
+        
+        
+)
+
+g6 <- barplot(myplot6,
+              main = "Female activity time spent",
+              xlab = "Activities",
+              ylab = "Minutes",
+              names.arg = c("Food Management", "Dish washing", "Laundry", "Ironing", "Gardening", "Construction and repairs"),
+              col = "lightpink", horiz = TRUE
+              
+              
+)
+```
+
+As we can see from the graph above, in general women spend more time on Ironing, Dish washing and Food management, while males usually spend more time on Construction and repair related activities.
+
+Here we have a graph that shows the mean time spent by Male and Female counterparts on leisure time related activities:
+
+```{r maligraph4, echo=FALSE, fig.height=15,error=FALSE,warning=FALSE}
+#male activity time spent
+data_AC6A = subset(Graph1,sex == "M" & acl00 =="AC6A" & age =="TOTAL")
+time1 <- data_AC6A$TIME_SP
+my_list_AC6A <- difftime(as.POSIXct(time1, format = '%H:%M'), as.POSIXct('00:00', format = '%H:%M'), units = 'min')
+AC6A <- mean(my_list_AC6A)
+
+data_AC733 = subset(Graph1,sex == "M" & acl00 =="AC733" & age =="TOTAL")
+time1 <- data_AC733$TIME_SP
+my_list_AC733 <- difftime(as.POSIXct(time1, format = '%H:%M'), as.POSIXct('00:00', format = '%H:%M'), units = 'min')
+AC733 <- mean(my_list_AC733)
+
+data_AC812 = subset(Graph1,sex == "M" & acl00 =="AC812" & age =="TOTAL")
+time1 <- data_AC812$TIME_SP
+my_list_AC812 <- difftime(as.POSIXct(time1, format = '%H:%M'), as.POSIXct('00:00', format = '%H:%M'), units = 'min')
+AC812 <- mean(my_list_AC812)
+
+data_AC82 = subset(Graph1,sex == "M" & acl00 =="AC82" & age =="TOTAL")
+time1 <- data_AC82$TIME_SP
+my_list_AC82 <- difftime(as.POSIXct(time1, format = '%H:%M'), as.POSIXct('00:00', format = '%H:%M'), units = 'min')
+AC82 <- mean(my_list_AC82)
+
+data_AC83 = subset(Graph1,sex == "M" & acl00 =="AC83" & age =="TOTAL")
+time1 <- data_AC83$TIME_SP
+my_list_AC83 <- difftime(as.POSIXct(time1, format = '%H:%M'), as.POSIXct('00:00', format = '%H:%M'), units = 'min')
+AC83 <- mean(my_list_AC83)
+
+data_AC7B = subset(Graph1,sex == "M" & acl00 =="AC7B" & age =="TOTAL")
+time1 <- data_AC7B$TIME_SP
+my_list_AC7B <- difftime(as.POSIXct(time1, format = '%H:%M'), as.POSIXct('00:00', format = '%H:%M'), units = 'min')
+AC7B <- mean(my_list_AC7B)
+
+myplot7 <- c(AC6A, AC733, AC812, AC82, AC83, AC7B)
+myplot7 <- gsub("Time difference of ","", myplot7)
+myplot7 <- gsub(" mins","", myplot7)
+myplot7 <- as.double(myplot7)
+#female activity time spent
+data_AC6A = subset(Graph1,sex == "F" & acl00 =="AC6A" & age =="TOTAL")
+time1 <- data_AC6A$TIME_SP
+my_list_AC6A <- difftime(as.POSIXct(time1, format = '%H:%M'), as.POSIXct('00:00', format = '%H:%M'), units = 'min')
+AC6A <- mean(my_list_AC6A)
+
+data_AC733 = subset(Graph1,sex == "F" & acl00 =="AC733" & age =="TOTAL")
+time1 <- data_AC733$TIME_SP
+my_list_AC733 <- difftime(as.POSIXct(time1, format = '%H:%M'), as.POSIXct('00:00', format = '%H:%M'), units = 'min')
+AC733 <- mean(my_list_AC733)
+
+data_AC812 = subset(Graph1,sex == "F" & acl00 =="AC812" & age =="TOTAL")
+time1 <- data_AC812$TIME_SP
+my_list_AC812 <- difftime(as.POSIXct(time1, format = '%H:%M'), as.POSIXct('00:00', format = '%H:%M'), units = 'min')
+AC812 <- mean(my_list_AC812)
+
+data_AC82 = subset(Graph1,sex == "F" & acl00 =="AC82" & age =="TOTAL")
+time1 <- data_AC82$TIME_SP
+my_list_AC82 <- difftime(as.POSIXct(time1, format = '%H:%M'), as.POSIXct('00:00', format = '%H:%M'), units = 'min')
+AC82 <- mean(my_list_AC82)
+
+data_AC83 = subset(Graph1,sex == "F" & acl00 =="AC83" & age =="TOTAL")
+time1 <- data_AC83$TIME_SP
+my_list_AC83 <- difftime(as.POSIXct(time1, format = '%H:%M'), as.POSIXct('00:00', format = '%H:%M'), units = 'min')
+AC83 <- mean(my_list_AC83)
+
+data_AC7B = subset(Graph1,sex == "F" & acl00 =="AC7B" & age =="TOTAL")
+time1 <- data_AC7B$TIME_SP
+my_list_AC7B <- difftime(as.POSIXct(time1, format = '%H:%M'), as.POSIXct('00:00', format = '%H:%M'), units = 'min')
+AC7B <- mean(my_list_AC7B)
+
+myplot8 <- c(AC6A, AC733, AC812, AC82, AC83, AC7B)
+myplot8 <- gsub("Time difference of ","", myplot8)
+myplot8 <- gsub(" mins","", myplot8)
+myplot8 <- as.double(myplot8)
+
+#-----------------------------------------------------------------------------------------------------------------
+# plot time spent females vs males
+par(mfrow = c(1:2))
+g7 <- barplot(myplot7,
+              main = "Male activity time spent",
+              xlab = "Activities",
+              ylab = "Minutes",
+              names.arg = c("Sports", "Computer games", "Reading books", "TV and Video", "Music", "Hobbies"),
+              col = "lightblue", horiz = TRUE
+              
+              
+)
+g8 <- barplot(myplot8,
+        main = "Female activity time spent",
+        xlab = "Activities",
+        ylab = "Minutes",
+        names.arg = c("Sports", "Computer games", "Reading books", "TV and Video", "Music", "Hobbies"),
+        col = "lightpink", horiz = TRUE
+        
+        
+)
+```
+
+As we can see from the above graph, in general women spend more time reading books, while males usually spend more time on computer games and sports .
 
